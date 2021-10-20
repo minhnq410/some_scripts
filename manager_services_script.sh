@@ -2,7 +2,9 @@
 # install snmp_exporter
 wget https://github.com/prometheus/snmp_exporter/releases/download/v0.20.0/snmp_exporter-0.20.0.linux-amd64.tar.gz
 tar zxvf snmp_exporter-0.20.0.linux-amd64.tar.gz
-cp ./snmp_exporter-0.20.0.linux-amd64/snmp_exporter /opt/
+mkdir /opt/snmp_exporter
+cp ./snmp_exporter-0.20.0.linux-amd64/snmp_exporter /opt/snmp_exporter
+cp ./config/snmp.yml /opt/snmp_exporter
 cp ./config/snmp_exporter.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now snmp_exporter.service
