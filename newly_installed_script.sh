@@ -2,7 +2,7 @@
 # Install tools
 yum install -y epel-release
 yum update -y
-yum install -y vim bash-completion bash-completion-extras yum-utils snmpd wget
+yum install -y vim bash-completion bash-completion-extras yum-utils wget net-snmp net-snmp-utils
 source /etc/profile.d/bash_completion.sh
 # install docker
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -20,4 +20,7 @@ chown node_exporter:node_exporter /usr/local/bin/node_exporter
 cp ./node_exporter.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable node_exporter.service --now
-rm -rf node_exporter*
+rm -rf node_exporter-1.2.2*
+# Enable snmpd
+\cp ./snmpd.conf /etc/snmp
+systemctl enable snmpd.service --now
