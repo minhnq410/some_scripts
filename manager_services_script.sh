@@ -6,7 +6,7 @@ cp ./snmp_exporter-0.20.0.linux-amd64/snmp_exporter /opt/
 cp ./config/snmp_exporter.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now snmp_exporter.service
-rm -rm snmp_exporter-0.20.0*
+rm -rf snmp_exporter-0.20.0*
 # expose docker daemon metrics
 cp ./config/daemon.json /etc/docker/
 systemctl restart docker.service
