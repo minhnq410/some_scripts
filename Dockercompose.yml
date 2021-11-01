@@ -12,11 +12,19 @@ services:
       - "5000:5000"
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
 
   cadvisor:
     image: grc.io/cadvisor/cadvisor:v0.42.0
     ports:
       - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
     deploy:
       mode: global
+    depends_on:
+      - webapi
+      
