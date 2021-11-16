@@ -9,6 +9,12 @@ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce
 yum install -y docker-ce docker-ce-cli containerd.io
 systemctl enable --now docker.socket docker.service
 # Add rules to firewalld
+# 2377 docker swarm
+# 9090 prometheus
+# 9100 node_exporter
+# 161 snmpd
+# 5000 todo-api
+# 8080 cadvisor
 firewall-cmd --permanent --add-port=2377/tcp --add-port=9090/tcp --add-port=9100/tcp --add-port=161/udp --add-port=5000/tcp --add-port=8080/tcp --zone=public
 firewall-cmd --reload
 # Installing Node_exporter
