@@ -6,7 +6,7 @@ version: "3.3"
 #    attachable: true
 
 services:
-  webapi:
+  TodoAPI:
     image: minhnq410/todo-api:latest
     ports:
       - "5000:5000"
