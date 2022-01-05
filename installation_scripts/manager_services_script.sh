@@ -9,9 +9,6 @@ cp ./config/snmp_exporter.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now snmp_exporter.service
 rm -rf snmp_exporter-0.20.0*
-# enable firewall for snmp_exporter
-firewall-cmd --permanent --add-port=9116/tcp --zone=public
-firewall-cmd --reload
 # expose docker daemon metrics
 cp ./config/daemon.json /etc/docker/
 systemctl restart docker.service

@@ -1,18 +1,74 @@
-version: "3.3"
+version: "3.4"
 
-#networks:
-#  - net:
-#    driver: overlay
-#    attachable: true
+networks:
+  my-net:
+    external: true
 
 services:
-  TodoAPI:
-    image: minhnq410/todo-api:latest
+  traefik:
+    image: traefik:v2.5.1
+    command:
+      - --api.insecure=true 
+      - --providers.docker
+      - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik_main`)
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.swarmmode
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --entrypoints.todoapi.address=:9988
+      - --providers.file.directory=/configuration/
+      - --providers.file.watch=true
+      - --accesslog
+      - --log
+      - --api
+    networks:
+      my-net:
     ports:
-      - "5000:5000"
+      - 80:80
+      - 443:443
+      - 8090:8080
+      - 9988:9988
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/configuration/traefik.toml
     deploy:
       mode: replicated
       replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=my-net
+        - traefik.constraint-label=traefik_main
+        - traefik.http.routers.traefik-public-http.entrypoints=http
+        - traefik.http.services.traefik-public.loadbalancer.server.port=8080
+
+  TodoAPI:
+    image: minhnq410/todoapi:nolimit-1s
+    labels:
+      - label.scale.max=6
+      - label.scale.min=2
+      - label.scale.each=1
+    networks:
+      my-net:
+    ports:
+      - "5080:5000"
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        order: start-first
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=my-net
+        - traefik.constraint-label=traefik_main
+        - traefik.tcp.routers.todoapi.entrypoints=todoapi
+        - traefik.tcp.routers.todoapi.rule=HostSNI(`*`)
+        - traefik.tcp.routers.todoapi.tls=false
+        - traefik.tcp.routers.todoapi.service=todoapi
+        - traefik.tcp.services.todoapi.loadbalancer.server.port=5000
+    depends_on:
+      - traefik
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.42.0
@@ -23,8 +79,10 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      my-net:
     deploy:
       mode: global
     depends_on:
-      - webapi
-      
+      - traefik
+      - TodoAPI
