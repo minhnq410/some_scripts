@@ -1,0 +1,24 @@
+# https://hub.docker.com/_/microsoft-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:5.0.404-alpine3.14-amd64 AS build
+WORKDIR /source
+
+
+# copy csproj and restore as distinct layers
+COPY TodoAPI.sln .
+COPY TodoAPI/*.csproj ./TodoAPI/
+RUN dotnet dev-certs https
+RUN dotnet restore
+
+# copy everything else and build app
+COPY TodoAPI/. ./TodoAPI/
+WORKDIR /source/TodoAPI
+RUN dotnet publish -c release -o /app
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.9-alpine3.13-amd64
+ENV ASPNETCORE_URLS="http://*:5000"
+ENV ASPNETCORE_ENVIRONMENT="Development"
+WORKDIR /app
+COPY --from=build /app ./
+#COPY ./entrypoint.sh ./
+ENTRYPOINT [ "dotnet","TodoAPI.dll" ]
