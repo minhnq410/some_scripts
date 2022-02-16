@@ -17,10 +17,10 @@ tar zxvf node_exporter-1.2.2.linux-amd64.tar.gz
 useradd --no-create-home --shell /bin/false node_exporter
 cp node_exporter-1.2.2.linux-amd64/node_exporter /usr/local/bin
 chown node_exporter:node_exporter /usr/local/bin/node_exporter
-cp ./config/node_exporter.service /etc/systemd/system/
+cp ../config/node_exporter.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable node_exporter.service --now
 rm -rf node_exporter-1.2.2*
 # Enable snmpd
-\cp ./config/snmpd.conf /etc/snmp
+\cp ../config/snmpd.conf /etc/snmp
 systemctl enable snmpd.service --now
